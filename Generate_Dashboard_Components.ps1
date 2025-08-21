@@ -18,10 +18,12 @@ if (!(Test-Path $OutputDir)) {
 
 # Function to generate DAX measures file
 function Generate-DAXMeasures {
-    $DAXContent = @"
--- MCCNO Executive Dashboard - DAX Measures
+    # Generate Sample Data Version
+    $DAXContentSample = @"
+-- MCCNO Executive Dashboard - DAX Measures (SAMPLE DATA VERSION)
 -- Generated from project specifications
 -- Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
+-- Compatible with: events_sample.csv, inventory_sample.csv, sales_sample.csv
 
 -- ===============================
 -- PRIMARY KPI MEASURES
@@ -29,26 +31,26 @@ function Generate-DAXMeasures {
 
 GMROI = 
 DIVIDE(
-    SUM(Sales[gross_margin]), 
-    AVERAGE(Inventory[qty] * Inventory[cost]), 
+    SUM(sales_sample[gross_margin]), 
+    AVERAGE(inventory_sample[qty] * inventory_sample[cost]), 
     0
 )
 
-Total_Revenue = SUM(Sales[revenue])
+Total_Revenue = SUM(sales_sample[revenue])
 
 Sell_Through_Rate = 
 DIVIDE(
-    SUM(Sales[units_sold]), 
-    SUM(Inventory[qty]), 
+    SUM(sales_sample[units_sold]), 
+    SUM(inventory_sample[qty]), 
     0
 )
 
 Days_of_Supply = 
 DIVIDE(
-    SUM(Inventory[qty]), 
+    SUM(inventory_sample[qty]), 
     CALCULATE(
-        AVERAGE(Sales[units_sold]), 
-        DATESINPERIOD(Date[date], TODAY(), -30, DAY)
+        AVERAGE(sales_sample[units_sold]), 
+        DATESINPERIOD(sales_sample[date], TODAY(), -30, DAY)
     ), 
     0
 )
@@ -59,49 +61,14 @@ DIVIDE(
 
 Event_Revenue = 
 CALCULATE(
-    SUM(Sales[revenue]), 
-    NOT(ISBLANK(Sales[event_id]))
+    SUM(sales_sample[revenue]), 
+    NOT(ISBLANK(sales_sample[event_id]))
 )
 
 Event_Conversion_Rate = 
 DIVIDE(
-    [Event_Revenue] / AVERAGE(Sales[price]), 
-    RELATED(Events[est_attendance]), 
-    0
-)
-
-Pre_Event_Inventory = 
-CALCULATE(
-    SUM(Inventory[qty]), 
-    DATEADD(Events[start_dt], -7, DAY)
-)
-
-Post_Event_Inventory = 
-CALCULATE(
-    SUM(Inventory[qty]), 
-    DATEADD(Events[end_dt], 3, DAY)
-)
-
--- ===============================
--- RISK & ALERT MEASURES
--- ===============================
-
-Stockout_Risk_SKUs = 
-CALCULATE(
-    DISTINCTCOUNT(Inventory[sku]), 
-    Inventory[qty] < Inventory[reorder_point]
-)
-
-Critical_Stock_Level = 
-CALCULATE(
-    DISTINCTCOUNT(Inventory[sku]), 
-    [Days_of_Supply] < 7
-)
-
-Shrink_Variance_Percent = 
-DIVIDE(
-    ABS([Expected_Inventory] - [Actual_Inventory]), 
-    [Expected_Inventory], 
+    CALCULATE(SUM(sales_sample[units_sold]), NOT(ISBLANK(sales_sample[event_id]))), 
+    RELATED(events_sample[est_attendance]), 
     0
 )
 
@@ -111,52 +78,118 @@ DIVIDE(
 
 Gross_Margin_Percent = 
 DIVIDE(
-    SUM(Sales[gross_margin]), 
-    SUM(Sales[revenue]), 
+    SUM(sales_sample[gross_margin]), 
+    SUM(sales_sample[revenue]), 
     0
 )
 
 Inventory_Value = 
-SUMX(Inventory, Inventory[qty] * Inventory[cost])
+SUMX(inventory_sample, inventory_sample[qty] * inventory_sample[cost])
 
 -- ===============================
--- TIME INTELLIGENCE MEASURES
+-- RISK & ALERT MEASURES
 -- ===============================
 
-Revenue_YTD = 
-TOTALYTD(SUM(Sales[revenue]), Date[date])
-
-Revenue_Previous_Month = 
+Stockout_Risk_SKUs = 
 CALCULATE(
-    SUM(Sales[revenue]), 
-    DATEADD(Date[date], -1, MONTH)
+    DISTINCTCOUNT(inventory_sample[sku]), 
+    inventory_sample[qty] < inventory_sample[reorder_point]
 )
 
-Revenue_Growth_Percent = 
+Critical_Stock_Level = 
+CALCULATE(
+    DISTINCTCOUNT(inventory_sample[sku]), 
+    [Days_of_Supply] < 7
+)
+"@
+
+    # Generate Template Version
+    $DAXContentTemplate = @"
+-- CLIENT DASHBOARD - DAX Measures (TEMPLATE VERSION)
+-- Generated from project specifications  
+-- Date: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
+-- Compatible with: Generic table and column names for any client
+
+-- ===============================
+-- PRIMARY KPI MEASURES
+-- ===============================
+
+GMROI = 
 DIVIDE(
-    [Total_Revenue] - [Revenue_Previous_Month], 
-    [Revenue_Previous_Month], 
+    SUM(Sales[GrossMargin]), 
+    AVERAGE(Inventory[Quantity] * Inventory[UnitCost]), 
+    0
+)
+
+Total_Revenue = SUM(Sales[Revenue])
+
+Sell_Through_Rate = 
+DIVIDE(
+    SUM(Sales[UnitsSold]), 
+    SUM(Inventory[Quantity]), 
+    0
+)
+
+Days_of_Supply = 
+DIVIDE(
+    SUM(Inventory[Quantity]), 
+    CALCULATE(
+        AVERAGE(Sales[UnitsSold]), 
+        DATESINPERIOD(Calendar[Date], TODAY(), -30, DAY)
+    ), 
     0
 )
 
 -- ===============================
--- CALCULATED COLUMNS
+-- EVENT IMPACT MEASURES
 -- ===============================
 
--- Add to Sales table:
--- Margin_Percent = DIVIDE(Sales[gross_margin], Sales[revenue], 0)
+Event_Revenue = 
+CALCULATE(
+    SUM(Sales[Revenue]), 
+    NOT(ISBLANK(Sales[EventID]))
+)
 
--- Add to Inventory table:
--- Inventory_Value = Inventory[qty] * Inventory[cost]
--- Stock_Status = IF(Inventory[qty] <= Inventory[reorder_point], "Reorder", IF(Inventory[qty] <= Inventory[safety_stock], "Critical", "Normal"))
+Event_Conversion_Rate = 
+DIVIDE(
+    CALCULATE(SUM(Sales[UnitsSold]), NOT(ISBLANK(Sales[EventID]))), 
+    RELATED(Events[EstimatedAttendance]), 
+    0
+)
 
--- Add to Events table:
--- Event_Duration_Hours = DATEDIFF(Events[start_dt], Events[end_dt], HOUR)
+-- ===============================
+-- FINANCIAL MEASURES
+-- ===============================
+
+Gross_Margin_Percent = 
+DIVIDE(
+    SUM(Sales[GrossMargin]), 
+    SUM(Sales[Revenue]), 
+    0
+)
+
+Inventory_Value = 
+SUMX(Inventory, Inventory[Quantity] * Inventory[UnitCost])
+
+-- ===============================
+-- CLIENT CUSTOMIZATION NOTES
+-- ===============================
+
+-- TO CUSTOMIZE FOR NEW CLIENT:
+-- 1. Replace table names with client's actual table names
+-- 2. Replace column names with client's actual column names  
+-- 3. Add client-specific KPIs and business rules
+-- 4. Adjust time intelligence based on client's fiscal calendar
 "@
 
-    $DAXFile = Join-Path $OutputDir "MCCNO_DAX_Measures.dax"
-    $DAXContent | Out-File -FilePath $DAXFile -Encoding UTF8
-    Write-Host "✅ Generated DAX measures: $DAXFile" -ForegroundColor Green
+    # Save both versions
+    $DAXFileSample = Join-Path $OutputDir "MCCNO_DAX_Measures.dax"
+    $DAXContentSample | Out-File -FilePath $DAXFileSample -Encoding UTF8
+    Write-Host "✅ Generated sample data DAX measures: $DAXFileSample" -ForegroundColor Green
+    
+    $DAXFileTemplate = Join-Path $OutputDir "MCCNO_DAX_Measures_Template.dax"
+    $DAXContentTemplate | Out-File -FilePath $DAXFileTemplate -Encoding UTF8
+    Write-Host "✅ Generated template DAX measures: $DAXFileTemplate" -ForegroundColor Green
 }
 
 # Function to generate Power Query M code

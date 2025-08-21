@@ -53,8 +53,8 @@ if ($PowerBIPath) {
     $FirstDAXMeasure = @"
 GMROI = 
 DIVIDE(
-    SUM(Sales[gross_margin]), 
-    AVERAGE(Inventory[qty] * Inventory[cost]), 
+    SUM(sales_sample[gross_margin]), 
+    AVERAGE(inventory_sample[qty] * inventory_sample[cost]), 
     0
 )
 "@
