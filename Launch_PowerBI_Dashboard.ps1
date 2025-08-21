@@ -12,8 +12,9 @@ Write-Host "=============================" -ForegroundColor Blue
 function Find-PowerBIDesktop {
     # Check if Power BI is currently running (most reliable method)
     $RunningPBI = Get-Process -Name "PBIDesktop" -ErrorAction SilentlyContinue
-    if ($RunningPBI) {
-        return $RunningPBI.Path
+    if ($RunningPBI -and $RunningPBI.Path) {
+        # Return first path if multiple instances running
+        return ($RunningPBI.Path | Select-Object -First 1)
     }
     
     # Common installation paths
@@ -71,7 +72,27 @@ DIVIDE(
     
     # Launch Power BI Desktop
     Write-Host "Launching Power BI Desktop..." -ForegroundColor Yellow
-    Start-Process $PowerBIPath
+    
+    try {
+        if ($PowerBIPath -eq "PBIDesktop") {
+            # Use Start-Process with shell execution for Store apps
+            Start-Process -FilePath "cmd" -ArgumentList "/c start PBIDesktop" -WindowStyle Hidden
+        } else {
+            # Use direct path for traditional installation
+            Start-Process -FilePath $PowerBIPath
+        }
+        Write-Host "✅ Power BI Desktop launched successfully!" -ForegroundColor Green
+    } catch {
+        Write-Host "⚠️  Power BI launch method 1 failed, trying alternative..." -ForegroundColor Yellow
+        try {
+            # Alternative launch method
+            Start-Process -FilePath "PBIDesktop" -ErrorAction Stop
+            Write-Host "✅ Power BI Desktop launched successfully!" -ForegroundColor Green
+        } catch {
+            Write-Host "❌ Could not launch Power BI Desktop automatically" -ForegroundColor Red
+            Write-Host "Please open Power BI Desktop manually and continue with the guide" -ForegroundColor Yellow
+        }
+    }
     
     Write-Host ""
     Write-Host "READY TO GO!" -ForegroundColor Green

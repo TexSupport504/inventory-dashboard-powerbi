@@ -337,7 +337,7 @@ function Generate-QuickSetupGuide {
 
 #### Step 2: Apply Theme (2 minutes)
 1. **View → Themes → Browse for themes**
-2. **Select:** branding-assets\MCCNO_Color_Palette.json
+2. **Select:** branding-assets\MCCNO_PowerBI_Theme.json
 3. **Verify colors applied**
 
 #### Step 3: Copy DAX Measures (5 minutes)
