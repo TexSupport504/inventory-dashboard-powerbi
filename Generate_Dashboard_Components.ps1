@@ -316,6 +316,16 @@ function Generate-LayoutSpec {
     $LayoutFile = Join-Path $OutputDir "MCCNO_Layout_Specification.json"
     $LayoutSpec | ConvertTo-Json -Depth 10 | Out-File -FilePath $LayoutFile -Encoding UTF8
     Write-Host "✅ Generated layout specification: $LayoutFile" -ForegroundColor Green
+    
+    # Also create readable versions
+    $ReadableGuide = Join-Path $OutputDir "MCCNO_Layout_Guide.md"
+    Copy-Item -Path "dashboard-files\Generated_Components\MCCNO_Layout_Guide.md" -Destination $ReadableGuide -Force
+    
+    $CleanJSON = Join-Path $OutputDir "MCCNO_Layout_Clean.json" 
+    Copy-Item -Path "dashboard-files\Generated_Components\MCCNO_Layout_Clean.json" -Destination $CleanJSON -Force
+    
+    $QuickRef = Join-Path $OutputDir "Quick_Copy_Layout.txt"
+    Copy-Item -Path "dashboard-files\Generated_Components\Quick_Copy_Layout.txt" -Destination $QuickRef -Force
 }
 
 # Function to create Power BI setup instructions
