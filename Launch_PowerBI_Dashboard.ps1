@@ -10,6 +10,13 @@ Write-Host "=============================" -ForegroundColor Blue
 
 # Function to find Power BI Desktop executable
 function Find-PowerBIDesktop {
+    # Check if Power BI is currently running (most reliable method)
+    $RunningPBI = Get-Process -Name "PBIDesktop" -ErrorAction SilentlyContinue
+    if ($RunningPBI) {
+        return $RunningPBI.Path
+    }
+    
+    # Common installation paths
     $CommonPaths = @(
         "${env:ProgramFiles}\Microsoft Power BI Desktop\bin\PBIDesktop.exe",
         "${env:LOCALAPPDATA}\Microsoft\WindowsApps\PBIDesktop.exe",
@@ -21,7 +28,18 @@ function Find-PowerBIDesktop {
             return $Path
         }
     }
-    return $null
+    
+    # Check Microsoft Store app location
+    $StoreAppPath = Get-ChildItem -Path "${env:ProgramFiles}\WindowsApps" -Filter "*PowerBI*" -Directory -ErrorAction SilentlyContinue |
+        Get-ChildItem -Filter "PBIDesktop.exe" -Recurse -ErrorAction SilentlyContinue |
+        Select-Object -First 1 -ExpandProperty FullName
+    
+    if ($StoreAppPath) {
+        return $StoreAppPath
+    }
+    
+    # Try launching via Start command (works for Store apps)
+    return "PBIDesktop"
 }
 
 # Check if Power BI Desktop is installed
