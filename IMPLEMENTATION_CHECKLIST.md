@@ -1,7 +1,9 @@
 # MCCNO Executive Dashboard - Full Implementation Checklist
+
 ## Step-by-Step Guide for Complete Deployment
 
 ### ✅ **PREPARATION PHASE - COMPLETE**
+
 - [x] Repository structure created
 - [x] Sample data prepared  
 - [x] MCCNO brand assets ready
@@ -13,9 +15,11 @@
 ## 🚀 **PHASE 1: DATA SOURCE SETUP (30 minutes)**
 
 ### **Step 1.1: ConventiCore Data Connection**
+
 **Your Data Source Located:** `D:\OneDrive\Documents\GitHub\monthly-inventory-manager\Events.xlsx`
 
 **Action Items:**
+
 - [ ] **Verify Excel Data Structure**
   - Open `D:\OneDrive\Documents\GitHub\monthly-inventory-manager\Events.xlsx`
   - Confirm tables exist: tblEvents, tblSKU, tblInventory, tblSales, tblConfig
@@ -29,6 +33,7 @@
   ```
 
 ### **Step 1.2: Backup Sample Data Connection**
+
 - [x] Sample data ready in: `sample-data\` folder
 - [x] Test files: events_sample.csv, inventory_sample.csv, sales_sample.csv
 - [x] KPI targets: kpi_targets.json
@@ -40,6 +45,7 @@
 ## 🎨 **PHASE 2: POWER BI DESKTOP SETUP (45 minutes)**
 
 ### **Step 2.1: Initial Configuration**
+
 **After Power BI Desktop Installation:**
 
 - [ ] **Launch Power BI Desktop**
@@ -52,18 +58,22 @@
   3. Verify colors: Navy (#003366), Golden (#FFB500), White (#FFFFFF)
 
 ### **Step 2.2: Data Import**
+
 **Primary Data Source (Recommended):**
+
 - [ ] File → Get Data → Excel
 - [ ] Browse to: `D:\OneDrive\Documents\GitHub\monthly-inventory-manager\Events.xlsx`
 - [ ] Select tables: Events, SKU, Inventory, Sales, Config (if available)
 - [ ] Click "Load" (not Transform initially)
 
 **Alternative - Sample Data:**
+
 - [ ] File → Get Data → Text/CSV
 - [ ] Import: events_sample.csv, inventory_sample.csv, sales_sample.csv
 - [ ] Use this if Excel file needs restructuring
 
 ### **Step 2.3: Data Model Creation**
+
 - [ ] **Create Relationships** (Model view)
   - Events.event_id ↔ Sales.event_id (Many-to-One)
   - SKU.sku ↔ Sales.sku (One-to-Many) 
@@ -80,6 +90,7 @@
 ## 📊 **PHASE 3: DASHBOARD PAGES (2 hours)**
 
 ### **Page 1: Executive Overview (45 minutes)**
+
 - [ ] **Create KPI Cards (4 cards)**
   - [ ] GMROI Card: `DIVIDE(SUM(Sales[gross_margin]), AVERAGE(Inventory[qty] * Inventory[cost]))`
   - [ ] Revenue Card: `SUM(Sales[revenue])`  
@@ -102,6 +113,7 @@
   - Interactive event details
 
 ### **Page 2: Event Impact Analysis (30 minutes)**
+
 - [ ] **Event Performance Matrix**
   - Scatter plot: Attendance vs Revenue  
   - Bubble size: Gross margin
@@ -120,6 +132,7 @@
   - Variance categorization
 
 ### **Page 3: Inventory Intelligence (30 minutes)**
+
 - [ ] **Stock Level Heat Map**
   - Matrix: Categories (rows) × Locations (columns)
   - Color scale: White→Navy→Red
@@ -138,6 +151,7 @@
   - Exception investigation tools
 
 ### **Page 4: Financial Performance (15 minutes)**
+
 - [ ] **Category P&L Analysis**
   - Stacked bar: Revenue/COGS/Margin
   - By category breakdown
@@ -159,6 +173,7 @@
 ## 🎯 **PHASE 4: INTERACTIVITY & BRANDING (30 minutes)**
 
 ### **Step 4.1: Filter Implementation**
+
 - [ ] **Add Slicers:**
   - Time Period (Month/Quarter/YTD)
   - Event Type (Conference/Launch/Training/Customer Event)
@@ -171,6 +186,7 @@
   - Consistent fonts: Segoe UI
 
 ### **Step 4.2: Navigation & Branding**
+
 - [ ] **Page Navigation:**
   - Clear page names with icons
   - Consistent layout across pages
@@ -190,6 +206,7 @@
 ## 📱 **PHASE 5: MOBILE & TESTING (45 minutes)**
 
 ### **Step 5.1: Mobile Layout**
+
 - [ ] **Switch to Mobile View**
   - View → Mobile layout
   - Rearrange for tablet/phone
@@ -200,6 +217,7 @@
   - Key metrics prominently displayed
 
 ### **Step 5.2: Testing & Validation**
+
 - [ ] **Data Accuracy Check**
   - Compare KPIs to source data
   - Verify calculations match expectations
@@ -220,6 +238,7 @@
 ## 🚀 **PHASE 6: DEPLOYMENT (30 minutes)**
 
 ### **Step 6.1: Power BI Service Publishing**
+
 - [ ] **Save .pbix File**
   - File → Save As → "MCCNO_Executive_Dashboard_v1.0.pbix"
   - Location: `dashboard-files\` folder
@@ -230,6 +249,7 @@
   - Set appropriate permissions
 
 ### **Step 6.2: Executive Review Preparation**
+
 - [ ] **Create Executive Demo**
   - Practice navigation flow
   - Prepare key insights talking points
@@ -245,12 +265,14 @@
 ## 📞 **SUPPORT & TROUBLESHOOTING**
 
 ### **Common Issues & Solutions**
+
 - **Data Connection Errors**: Check file paths and permissions
 - **Performance Issues**: Reduce data model complexity, optimize DAX
 - **Brand Colors Not Applying**: Re-import theme, verify JSON format
 - **Mobile Display Issues**: Recreate mobile layout, test on devices
 
 ### **Resources Available**
+
 - [ ] **Technical Guide**: `Power_BI_Setup_Guide.md`
 - [ ] **User Manual**: `Executive_User_Guide.md` 
 - [ ] **Brand Standards**: `MCCNO_Brand_Guidelines.md`
@@ -261,6 +283,7 @@
 ## 🏆 **SUCCESS CRITERIA**
 
 ### **Technical Validation**
+
 - [ ] All 4 pages load successfully
 - [ ] KPIs calculate correctly
 - [ ] Filters work across all pages
@@ -268,12 +291,14 @@
 - [ ] MCCNO branding is consistent
 
 ### **Business Validation**
+
 - [ ] Executive stakeholders can navigate intuitively
 - [ ] Key insights are immediately apparent
 - [ ] Decision support information is actionable
 - [ ] Performance meets or exceeds expectations
 
 ### **Final Checklist**
+
 - [ ] Dashboard demonstrates 15% revenue optimization potential
 - [ ] Risk alerts provide 8% revenue loss prevention
 - [ ] Working capital optimization shows 12% improvement opportunity
