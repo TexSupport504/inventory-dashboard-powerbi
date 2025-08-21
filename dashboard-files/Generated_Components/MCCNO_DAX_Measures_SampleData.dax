@@ -10,7 +10,7 @@
 GMROI = 
 DIVIDE(
     SUM(sales_sample[gross_margin]), 
-    AVERAGE(inventory_sample[qty] * inventory_sample[cost]), 
+    SUMX(inventory_sample, inventory_sample[qty] * inventory_sample[cost]) / COUNTROWS(inventory_sample), 
     0
 )
 
@@ -25,7 +25,7 @@ DIVIDE(
 
 Days_of_Supply = 
 DIVIDE(
-    SUM(inventory_sample[qty]), 
+    AVERAGE(inventory_sample[qty]), 
     CALCULATE(
         AVERAGE(sales_sample[units_sold]), 
         DATESINPERIOD(sales_sample[date], TODAY(), -30, DAY)
@@ -46,20 +46,26 @@ CALCULATE(
 Event_Conversion_Rate = 
 DIVIDE(
     CALCULATE(SUM(sales_sample[units_sold]), NOT(ISBLANK(sales_sample[event_id]))), 
-    RELATED(events_sample[est_attendance]), 
+    SUM(events_sample[est_attendance]), 
     0
 )
 
 Pre_Event_Inventory = 
 CALCULATE(
     SUM(inventory_sample[qty]), 
-    DATEADD(events_sample[start_dt], -7, DAY)
+    FILTER(
+        ALL(events_sample),
+        events_sample[start_dt] >= TODAY() - 7 && events_sample[start_dt] <= TODAY()
+    )
 )
 
 Post_Event_Inventory = 
 CALCULATE(
     SUM(inventory_sample[qty]), 
-    DATEADD(events_sample[end_dt], 3, DAY)
+    FILTER(
+        ALL(events_sample),
+        events_sample[end_dt] <= TODAY() + 3 && events_sample[end_dt] >= TODAY()
+    )
 )
 
 -- ===============================
@@ -160,7 +166,7 @@ TOTALYTD(SUM(sales_sample[revenue]), sales_sample[date])
 Revenue_Previous_Month = 
 CALCULATE(
     SUM(sales_sample[revenue]), 
-    DATEADD(sales_sample[date], -1, MONTH)
+    PARALLELPERIOD(sales_sample[date], -1, MONTH)
 )
 
 Revenue_Growth_Percent = 

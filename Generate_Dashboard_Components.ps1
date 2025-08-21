@@ -32,7 +32,7 @@ function Generate-DAXMeasures {
 GMROI = 
 DIVIDE(
     SUM(sales_sample[gross_margin]), 
-    AVERAGE(inventory_sample[qty] * inventory_sample[cost]), 
+    SUMX(inventory_sample, inventory_sample[qty] * inventory_sample[cost]) / COUNTROWS(inventory_sample), 
     0
 )
 

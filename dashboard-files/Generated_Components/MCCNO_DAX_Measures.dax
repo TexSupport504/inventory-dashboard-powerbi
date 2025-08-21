@@ -10,7 +10,7 @@
 GMROI = 
 DIVIDE(
     SUM(sales_sample[gross_margin]), 
-    AVERAGE(inventory_sample[qty] * inventory_sample[cost]), 
+    SUMX(inventory_sample, inventory_sample[qty] * inventory_sample[cost]) / COUNTROWS(inventory_sample), 
     0
 )
 
@@ -25,7 +25,7 @@ DIVIDE(
 
 Days_of_Supply = 
 DIVIDE(
-    SUM(inventory_sample[qty]), 
+    AVERAGE(inventory_sample[qty]), 
     CALCULATE(
         AVERAGE(sales_sample[units_sold]), 
         DATESINPERIOD(sales_sample[date], TODAY(), -30, DAY)
@@ -46,7 +46,7 @@ CALCULATE(
 Event_Conversion_Rate = 
 DIVIDE(
     CALCULATE(SUM(sales_sample[units_sold]), NOT(ISBLANK(sales_sample[event_id]))), 
-    RELATED(events_sample[est_attendance]), 
+    SUM(events_sample[est_attendance]), 
     0
 )
 
