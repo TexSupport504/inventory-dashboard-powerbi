@@ -10,7 +10,7 @@
 GMROI = 
 DIVIDE(
     SUM(sales_sample[gross_margin]), 
-    SUMX(inventory_sample, inventory_sample[qty] * inventory_sample[cost]) / COUNTROWS(inventory_sample), 
+    AVERAGEX(inventory_sample, inventory_sample[qty] * inventory_sample[cost]), 
     0
 )
 
@@ -75,7 +75,22 @@ CALCULATE(
 )
 
 Critical_Stock_Level = 
-CALCULATE(
-    DISTINCTCOUNT(inventory_sample[sku]), 
-    [Days_of_Supply] < 7
+SUMX(
+    VALUES(inventory_sample[sku]),
+    IF(
+        DIVIDE(
+            CALCULATE(
+                AVERAGE(inventory_sample[qty]), 
+                inventory_sample[sku] = EARLIER(inventory_sample[sku])
+            ), 
+            CALCULATE(
+                AVERAGE(sales_sample[units_sold]), 
+                DATESINPERIOD(sales_sample[date], TODAY(), -30, DAY),
+                sales_sample[sku] = EARLIER(inventory_sample[sku])
+            ), 
+            0
+        ) < 7,
+        1,
+        0
+    )
 )
